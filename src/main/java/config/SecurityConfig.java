@@ -22,55 +22,42 @@ public class SecurityConfig {
             throws Exception {
 
         http
-            // CSRF disabled for existing admin JS APIs
             .csrf(csrf -> csrf.disable())
 
             .authorizeHttpRequests(auth -> auth
 
-                // Public website
+                // Public website pages and assets
                 .requestMatchers(
                     "/",
-                    "/error",
+                    "/index.html",
                     "/home.html",
                     "/home.css",
                     "/home.js",
+                    "/style.css",
+                    "/script.js",
+                    "/favicon.ico",
+                    "/error",
                     "/uploads/**"
                 ).permitAll()
 
-                // Public gallery and announcements
+                // Public APIs
                 .requestMatchers(
-                    "/api/public/gallery",
-                    "/api/public/announcements"
+                    "/api/public/**"
                 ).permitAll()
 
-                // Public courses API
                 .requestMatchers(
                     HttpMethod.GET,
-                    "/api/courses/public"
-                ).permitAll()
-
-                // Public faculty API
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/faculty/public"
-                ).permitAll()
-
-                // Public testimonials API
-                .requestMatchers(
-                    HttpMethod.GET,
-                    "/api/testimonials/public"
-                ).permitAll()
-
-                // Public student results API
-                .requestMatchers(
-                    HttpMethod.GET,
+                    "/api/courses/public",
+                    "/api/faculty/public",
+                    "/api/testimonials/public",
                     "/api/results/public"
                 ).permitAll()
 
-                // Public admin login page and assets
+                // Admin login
                 .requestMatchers(
                     "/admin-login.html",
-                    "/admin-login.css"
+                    "/admin-login.css",
+                    "/login"
                 ).permitAll()
 
                 // Public enquiry submission
@@ -79,14 +66,13 @@ public class SecurityConfig {
                     "/api/enquiries"
                 ).permitAll()
 
-                // Admin-only APIs
+                // All other API endpoints require admin
                 .requestMatchers("/api/**").hasRole("ADMIN")
 
-                // Other pages require login
+                // Everything else requires authentication
                 .anyRequest().authenticated()
             )
 
-            // Session-based login
             .formLogin(form -> form
                 .loginPage("/admin-login.html")
                 .loginProcessingUrl("/login")
@@ -95,7 +81,6 @@ public class SecurityConfig {
                 .permitAll()
             )
 
-            // Logout
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/home.html?logout")
